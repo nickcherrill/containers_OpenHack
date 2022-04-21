@@ -1,0 +1,95 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: web-view
+  namespace: web
+rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["pods, services"]
+    verbs: ["get", "watch", "list"]
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: web-edit
+  namespace: web
+rules:
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: api-view
+  namespace: api
+rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["pods, services"]
+    verbs: ["get", "watch", "list"]
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: api-edit
+  namespace: api
+rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: web-edit
+  namespace: web
+roleRef:
+  kind: ClusterRole
+  name: edit
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: Group
+    name: "e0646233-0df2-4e93-9e95-cfc49e521e2a"
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: web-view
+  namespace: api
+roleRef:
+  kind: ClusterRole
+  name: view
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: Group
+    name: "e0646233-0df2-4e93-9e95-cfc49e521e2a"
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: api-edit
+  namespace: api
+roleRef:
+  kind: ClusterRole
+  name: edit
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: Group
+    name: "b2868c8c-8dcc-4413-bfa8-c20bdc1e7a6a"
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: api-view
+  namespace: web
+roleRef:
+  kind: ClusterRole
+  name: view
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: Group
+    name: "b2868c8c-8dcc-4413-bfa8-c20bdc1e7a6a"
+    apiGroup: rbac.authorization.k8s.io

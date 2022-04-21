@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tripviewer1
+  labels:
+    deploy: tripviewer1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tripviewer1
+  template:
+    metadata:
+      labels:
+        app: tripviewer1
+    spec:
+      containers:
+        - image: "registryxcw9261.azurecr.io/tripinsights/tripviewer:1.0"
+          imagePullPolicy: Always
+          name: tripviewer1
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 443
+              name: https
+              protocol: TCP
+      env:
+        - name: USERPROFILE_API_ENDPOINT
+          value: "http://10.100.0.175:80/"
+        - name: TRIPS_API_ENDPOINT
+          value: "http://10.100.2.240:80/"
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tripviewer1
+  spec:
+    type: LoadBalancer
+    clusterIP: 10.100.2.2
+    selector:
+      app: tripviewer1
+    ports:
+      - protocol: TCP
+        name: http
+        port: 80
+        targetPort: 80
+      - protocol: TCP
+        name: https
+        port: 443
+        targetPort: 443

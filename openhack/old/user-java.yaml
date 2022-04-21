@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-java
+  labels:
+    deploy: user-java
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-java
+  template:
+    metadata:
+      labels:
+        app: user-java
+    spec:
+      containers:
+        - image: "registryxcw9261.azurecr.io/tripinsights/user-java:1.0"
+          imagePullPolicy: Always
+          name: user-java
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 443
+              name: https
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: SQL_SERVER
+              value: "sqlserverxcw9261.database.windows.net"
+            - name: SQL_DATABASE
+              value: "mydrivingDB"
+            - name: SQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: sql-username
+                  key: username
+                  optional:
+                    false # same as default; "mysecret" must exist
+                    # and include a key named "username"
+            - name: SQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sql-password
+                  key: password
+                  optional:
+                    false # same as default; "mysecret" must exist
+                    # and include a key named "password"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-java
+  namespace: api
+spec:
+  type: LoadBalancer
+  selector:
+    app: user-java
+  ports:
+    - protocol: TCP
+      name: http
+      port: 80
+      targetPort: 80
+    - protocol: TCP
+      name: https
+      port: 443
+      targetPort: 443
